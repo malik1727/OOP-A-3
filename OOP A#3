@@ -1,0 +1,120 @@
+//Q1(B)
+#pragma once
+
+class Shape {
+public:
+    virtual ~Shape() = default;  
+    virtual double area() const = 0;  };
+
+#pragma once
+#include "Shape.h"
+
+class Circle : public Shape {
+private:
+    double radius;
+
+public:
+    Circle(double r) : radius(r) {}
+    double area() const override {
+        return 3.14 * radius * radius;
+    }
+};
+
+#pragma once
+#include "Shape.h"
+
+class Rectangle : public Shape {
+private:
+    double length;
+    double width;
+
+public:
+    Rectangle(double l, double w) : length(l), width(w) {}
+    double area() const override {
+        return length * width;
+    }
+};
+//Q2
+#include <iostream>
+#include <string>
+class Product {
+private:
+    int productId;
+    std::string productName;
+    double price;
+public:
+    Product(int id, const std::string& name, double pr) : productId(id), productName(name), price(pr) {}
+    void displayDetails() const {
+        std::cout << "Product ID: " << productId << "\tName: " << productName << "\tPrice: $" << price << std::endl;
+    }
+    double getPrice() const {
+        return price;
+    }
+};
+class ShoppingCart {
+private:
+    Product** products; 
+    int capacity;
+    int itemCount;
+public:
+    ShoppingCart(int cap) : capacity(cap), itemCount(0) {
+        products = new Product*[capacity];
+    }
+    ~ShoppingCart() {
+        for (int i = 0; i < itemCount; ++i) {
+            delete products[i];
+        }
+        delete[] products;
+    }
+    void addProduct(Product* product) {
+        if (itemCount < capacity) {
+            products[itemCount++] = product;
+        } else {
+            std::cout << "Shopping Cart is full. Cannot add more products." << std::endl;
+        }
+    }
+    void displayProducts() const {
+        std::cout << "Products in the Shopping Cart:" << std::endl;
+        for (int i = 0; i < itemCount; ++i) {
+            products[i]->displayDetails();
+        }
+    }
+    double calculateTotalCost() const {
+        double totalCost = 0.0;
+        for (int i = 0; i < itemCount; ++i) {
+            totalCost += products[i]->getPrice();
+        }
+        return totalCost;
+    }
+};
+class User {
+private:
+    int userId;
+    ShoppingCart* shoppingCart; public:
+    User(int id) : userId(id), shoppingCart(nullptr) {}
+    ~User() {
+        delete shoppingCart; 
+    }
+    void displayDetails() const {
+        std::cout << "User ID: " << userId << std::endl;
+    }
+    void associateShoppingCart(ShoppingCart* cart) {
+        shoppingCart = cart;
+    }
+};
+int main() {
+    Product* product1 = new Product(1, "Laptop", 1200.0);
+    Product* product2 = new Product(2, "Phone", 800.0);
+    ShoppingCart* cart = new ShoppingCart(5);
+    cart->addProduct(product1);
+    cart->addProduct(product2);
+    User user1(101);
+    user1.associateShoppingCart(cart);
+    user1.displayDetails();
+    user1.associateShoppingCart(cart); 
+    cart->displayProducts();
+    std::cout << "Total Cost: $" << cart->calculateTotalCost() << std::endl;
+    delete product1;
+    delete product2;
+    return 0;
+}
